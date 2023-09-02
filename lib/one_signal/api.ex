@@ -65,7 +65,6 @@ defmodule OneSignal.API do
     IO.inspect url, label: "url"
     IO.inspect body, label: "body"
 
-    System.get_all_env() |> IO.inspect(label: "ALL_ENV")
     Application.get_all_env() |> IO.inspect(label: "ALL_ENV")
 
     responses =
