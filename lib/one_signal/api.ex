@@ -65,7 +65,7 @@ defmodule OneSignal.API do
     IO.inspect url, label: "url"
     IO.inspect body, label: "body"
 
-    Application.get_all_env() |> IO.inspect(label: "ALL_ENV")
+    Application.get_all_env(:one_signal) |> IO.inspect(label: "ALL_ENV")
 
     responses =
       if include_legacy_notifications(),
