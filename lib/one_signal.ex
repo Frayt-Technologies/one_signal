@@ -34,22 +34,22 @@ defmodule OneSignal do
   end
 
   defp fetch_api_key(:legacy) do
-    Utils.config()[:legacy_api_key] || System.get_env("ONE_SIGNAL_LEGACY_API_KEY")
+    Utils.config()[:legacy_api_key] || Application.get_env("ONE_SIGNAL_LEGACY_API_KEY")
   end
 
   defp fetch_api_key(:current) do
-    Utils.config()[:api_key] || System.get_env("ONE_SIGNAL_API_KEY")
+    Utils.config()[:api_key] || Application.get_env("ONE_SIGNAL_API_KEY")
   end
 
   def fetch_app_id(:legacy) do
-    Utils.config()[:legacy_app_id] || System.get_env("ONE_SIGNAL_LEGACY_APP_ID")
+    Utils.config()[:legacy_app_id] || Application.get_env("ONE_SIGNAL_LEGACY_APP_ID")
   end
 
   def fetch_app_id(:current) do
-    Utils.config()[:app_id] || System.get_env("ONE_SIGNAL_APP_ID")
+    Utils.config()[:app_id] || Application.get_env("ONE_SIGNAL_APP_ID")
   end
 
   def fetch_from_number() do
-    Utils.config()[:sms_from_number] || System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER")
+    Utils.config()[:sms_from_number] || Application.get_env("ONE_SIGNAL_SMS_FROM_NUMBER")
   end
 end
