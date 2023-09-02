@@ -62,11 +62,6 @@ defmodule OneSignal.API do
   end
 
   defp post_request(url, body) do
-    IO.inspect url, label: "url"
-    IO.inspect body, label: "body"
-
-    Application.get_all_env(:one_signal) |> IO.inspect(label: "ALL_ENV")
-
     responses =
       if include_legacy_notifications(),
         do: [post_request(url, body, :current), post_request(url, body, :legacy)],
@@ -78,11 +73,9 @@ defmodule OneSignal.API do
   defp post_request(url, body, type) do
     with body <- Map.put(body, :app_id, OneSignal.fetch_app_id(type)),
          {:ok, req_body} <- Poison.encode(body),
-         _ <- IO.inspect(body, label: "req_body"),
          post_notification <- Utils.config()[:post_notification],
          {:ok, req_header} <- OneSignal.auth_header(type),
-         {:ok, response} <- post_notification.(url, req_body, req_header),
-         _ <- IO.inspect(response, label: "response") do
+         {:ok, response} <- post_notification.(url, req_body, req_header) do
       {:ok, response}
     else
       {:error, error} ->
