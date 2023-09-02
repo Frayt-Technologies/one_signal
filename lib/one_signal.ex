@@ -7,6 +7,8 @@ defmodule OneSignal do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    System.get_all_env() |> IO.inspect(label: "ALL_ENV")
+
     children = []
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
@@ -34,22 +36,22 @@ defmodule OneSignal do
   end
 
   defp fetch_api_key(:legacy) do
-    Utils.config()[:legacy_api_key] || Application.get_env("ONE_SIGNAL_LEGACY_API_KEY")
+    Utils.config()[:legacy_api_key] || Application.get_env(:one_signal, :legacy_api_key)
   end
 
   defp fetch_api_key(:current) do
-    Utils.config()[:api_key] || Application.get_env("ONE_SIGNAL_API_KEY")
+    Utils.config()[:api_key] || Application.get_env(:one_signal, :api_key)
   end
 
   def fetch_app_id(:legacy) do
-    Utils.config()[:legacy_app_id] || Application.get_env("ONE_SIGNAL_LEGACY_APP_ID")
+    Utils.config()[:legacy_app_id] || Application.get_env(:one_signal, :legacy_app_id)
   end
 
   def fetch_app_id(:current) do
-    Utils.config()[:app_id] || Application.get_env("ONE_SIGNAL_APP_ID")
+    Utils.config()[:app_id] || Application.get_env(:one_signal, :app_id)
   end
 
   def fetch_from_number() do
-    Utils.config()[:sms_from_number] || Application.get_env("ONE_SIGNAL_SMS_FROM_NUMBER")
+    Utils.config()[:sms_from_number] || Application.get_env(:one_signal, :sms_from_number)
   end
 end
