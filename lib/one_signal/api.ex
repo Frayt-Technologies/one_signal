@@ -64,6 +64,10 @@ defmodule OneSignal.API do
   defp post_request(url, body) do
     IO.inspect url, label: "url"
     IO.inspect body, label: "body"
+
+    System.get_all_env() |> IO.inspect(label: "ALL_ENV")
+    Application.get_all_env() |> IO.inspect(label: "ALL_ENV")
+
     responses =
       if include_legacy_notifications(),
         do: [post_request(url, body, :current), post_request(url, body, :legacy)],

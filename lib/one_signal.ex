@@ -7,8 +7,6 @@ defmodule OneSignal do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    System.get_all_env() |> IO.inspect(label: "ALL_ENV")
-
     children = []
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
