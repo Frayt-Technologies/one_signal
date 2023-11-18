@@ -1,5 +1,5 @@
 defmodule OneSignal.Notification do
-  defstruct id: nil, recipients: 0
+  defstruct id: nil, recipients: 0, errors: []
 
   def post_notification_url() do
     OneSignal.endpoint() <> "/notifications"
