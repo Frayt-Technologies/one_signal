@@ -12,22 +12,16 @@ defmodule OneSignal.API do
   def get(url, query \\ []) do
     start()
 
-    with url <- OneSignal.Utils.format_url(url, query),
-         {:ok, response} <- get_request(url) do
-      response |> handle_response()
-    else
-      {:error, error} -> {:error, error}
-      error -> {:error, {:unknown, "An unknown error has occured", error}}
-    end
+    url
+    |> OneSignal.Utils.format_url(query)
+    |> get_request()
+    |> handle_response()
   end
 
   defp get_request(url) do
-    responses =
-      if include_legacy_notifications(),
-        do: [get_request(url, :current), get_request(url, :legacy)],
-        else: [get_request(url, :current)]
-
-    responses |> pick_response()
+    if include_legacy_notifications(),
+      do: [get_request(url, :current), get_request(url, :legacy)],
+      else: [get_request(url, :current)]
   end
 
   defp get_request(url, type) do
@@ -50,24 +44,13 @@ defmodule OneSignal.API do
   def post(url, body) do
     start()
 
-    with {:ok, response} <- post_request(url, body) do
-      response |> handle_response()
-    else
-      {:error, error} ->
-        {:error, error}
-
-      error ->
-        {:error, {:unknown, "An unknown error has occured", error}}
-    end
+    post_request(url, body) |> handle_response()
   end
 
   defp post_request(url, body) do
-    responses =
-      if include_legacy_notifications(),
-        do: [post_request(url, body, :current), post_request(url, body, :legacy)],
-        else: [post_request(url, body, :current)]
-
-    responses |> pick_response()
+    if include_legacy_notifications(),
+      do: [post_request(url, body, :current), post_request(url, body, :legacy)],
+      else: [post_request(url, body, :current)]
   end
 
   defp post_request(url, body, type) do
@@ -96,21 +79,13 @@ defmodule OneSignal.API do
   def delete(url) do
     start()
 
-    with {:ok, response} <- delete_request(url) do
-      response |> handle_response()
-    else
-      {:error, error} -> {:error, error}
-      error -> {:error, {:unknown, "An unknown error has occured", error}}
-    end
+    url |> delete_request() |> handle_response()
   end
 
   defp delete_request(url) do
-    responses =
-      if include_legacy_notifications(),
-        do: [delete_request(url, :current), delete_request(url, :legacy)],
-        else: [delete_request(url, :current)]
-
-    responses |> pick_response()
+    if include_legacy_notifications(),
+      do: [delete_request(url, :current), delete_request(url, :legacy)],
+      else: [delete_request(url, :current)]
   end
 
   defp delete_request(url, type) do
@@ -123,7 +98,11 @@ defmodule OneSignal.API do
     end
   end
 
-  defp handle_response(%Response{body: body, status_code: code})
+  defp handle_response(responses) when is_list(responses) do
+    responses |> Enum.map(&handle_response/1) |> pick_response()
+  end
+
+  defp handle_response({:ok, %Response{body: body, status_code: code}})
        when code in 200..299 do
     case Poison.decode(body) do
       {:ok, result} -> {:ok, result}
@@ -133,15 +112,16 @@ defmodule OneSignal.API do
     end
   end
 
-  defp handle_response(%Response{body: body, status_code: _code}) do
-    with {:ok, result} <- Poison.decode(body) do
-      {:error, {:httpoison, result}}
-    else
+  defp handle_response({:ok, %Response{body: body, status_code: _code}}) do
+    case Poison.decode(body) do
+      {:ok, result} -> {:error, {:httpoison, result}}
       {:error, :invalid} -> {:error, {:invalid, "Could not parse invalid body"}}
       {:error, error} -> {:error, error}
       error -> {:error, {:unknown, "An unknown error has occured", error}}
     end
   end
+
+  defp handle_response({:error, error}), do: {:error, error}
 
   defp handle_response(error),
     do: {:error, {:unknown, "An unknown error has occured", error}}
@@ -156,6 +136,7 @@ defmodule OneSignal.API do
   defp pick_response(responses) do
     success =
       Enum.find(responses, fn
+        {:ok, %{"errors" => _}} -> false
         {:ok, _} -> true
         _ -> false
       end)
