@@ -51,4 +51,51 @@ defmodule OneSignal.Utils do
 
     "#{root}#{path}="
   end
+
+  @spec object_name_to_module(String.t()) :: module
+  def object_name_to_module("onesignal.user"), do: OneSignal.User
+  def object_name_to_module("onesignal.subscription"), do: OneSignal.Subscription
+
+  @spec module_to_string(module) :: String.t()
+  def module_to_string(module) do
+    module |> Atom.to_string() |> String.trim_leading("Elixir.")
+  end
+
+  @doc """
+  Performs a root-level conversion of map keys from strings to atoms.
+
+  This function performs the transformation safely using `String.to_existing_atom/1`, but this has a possibility to raise if
+  there is not a corresponding atom.
+
+  It is recommended that you pre-filter maps for known values before
+  calling this function.
+
+  ## Examples
+
+  iex> map = %{
+  ...>   "a"=> %{
+  ...>     "b" => %{
+  ...>       "c" => 1
+  ...>     }
+  ...>   }
+  ...> }
+  iex> OneSignal.Util.map_keys_to_atoms(map)
+  %{
+    a: %{
+      "b" => %{
+        "c" => 1
+      }
+    }
+  }
+  """
+  def map_keys_to_atoms(m) do
+    Enum.into(m, %{}, fn
+      {k, v} when is_binary(k) ->
+        a = String.to_atom(k)
+        {a, v}
+
+      entry ->
+        entry
+    end)
+  end
 end
