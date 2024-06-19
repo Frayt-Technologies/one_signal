@@ -31,6 +31,7 @@ use Mix.Config
 config :one_signal, OneSignal,
   api_key: "your api key",
   app_id: "your app id",
+  api_base_url: "one signal api base url",
   legacy_api_key: "your legacy api key",
   legacy_app_id: "your legacy app id",
   sms_from: "your registered Twilio phone number in E.164 format",

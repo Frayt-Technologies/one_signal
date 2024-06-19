@@ -2,6 +2,9 @@ defmodule OneSignal do
   use Application
   alias OneSignal.Utils
 
+  @type id :: String.t()
+  @type options :: Keyword.t()
+
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do

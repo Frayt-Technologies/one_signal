@@ -51,4 +51,24 @@ defmodule OneSignal.Utils do
 
     "#{root}#{path}="
   end
+
+  @spec object_name_to_module(String.t()) :: module
+  def object_name_to_module("onesignal.user"), do: OneSignal.User
+  def object_name_to_module("onesignal.subscription"), do: OneSignal.Subscription
+
+  @spec module_to_string(module) :: String.t()
+  def module_to_string(module) do
+    module |> Atom.to_string() |> String.trim_leading("Elixir.")
+  end
+
+  def map_keys_to_atoms(m) do
+    Enum.into(m, %{}, fn
+      {k, v} when is_binary(k) ->
+        a = String.to_atom(k)
+        {a, v}
+
+      entry ->
+        entry
+    end)
+  end
 end
