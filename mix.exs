@@ -20,7 +20,11 @@ defmodule OneSignal.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application() do
-    [applications: [:logger], mod: {OneSignal, []}, extra_applications: [:poison]]
+    [
+      applications: [:hackney, :logger, :jason, :uri_query],
+      mod: {OneSignal, []},
+      extra_applications: [:poison]
+    ]
   end
 
   defp package() do
@@ -35,7 +39,10 @@ defmodule OneSignal.Mixfile do
     [
       {:poison, "~> 3.1.0"},
       {:httpoison, "~> 1.8.0"},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:uri_query, "~> 0.1.2"},
+      {:jason, "~> 1.0"},
+      {:hackney, "~> 1.18.1"}
     ]
   end
 end
