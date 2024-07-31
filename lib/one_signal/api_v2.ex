@@ -37,7 +37,7 @@ defmodule OneSignal.API_V2 do
     req_body =
       body
       |> OneSignal.Utils.map_keys_to_atoms()
-      |> OneSignal.URI.encode_query()
+      |> Jason.encode!()
 
     perform_request(req_url, method, req_body, headers, opts)
   end
@@ -58,7 +58,7 @@ defmodule OneSignal.API_V2 do
   defp add_idempotency_header(nil, headers, _), do: headers
 
   defp add_idempotency_header(idempotency_key, headers, :post) do
-    Map.put(headers, "Idempotency-Key", idempotency_key)
+    Map.put(headers, "idempotency-key", idempotency_key)
   end
 
   @doc """
@@ -100,8 +100,8 @@ defmodule OneSignal.API_V2 do
   defp add_default_headers(existing_headers) do
     existing_headers = add_common_headers(existing_headers)
 
-    case Map.has_key?(existing_headers, "Content-Type") do
-      false -> existing_headers |> Map.put("Content-Type", "application/x-www-form-urlencoded")
+    case Map.has_key?(existing_headers, "content-type") do
+      false -> existing_headers |> Map.put("content-type", "application/json")
       true -> existing_headers
     end
   end
@@ -109,16 +109,16 @@ defmodule OneSignal.API_V2 do
   @spec add_common_headers(headers) :: headers
   defp add_common_headers(existing_headers) do
     Map.merge(existing_headers, %{
-      "Accept" => "application/json; charset=utf8",
-      "Accept-Encoding" => "gzip",
-      "Connection" => "keep-alive"
+      "accept" => "application/json; charset=utf8",
+      "accept-encoding" => "gzip",
+      "connection" => "keep-alive"
     })
   end
 
   @spec add_auth_header(headers, String.t() | nil) :: headers
   defp add_auth_header(existing_headers, api_key) do
     api_key = fetch_api_key(api_key)
-    Map.put(existing_headers, "Authorization", "Bearer #{api_key}")
+    Map.put(existing_headers, "Authorization", "Basic #{api_key}")
   end
 
   @spec fetch_api_key(String.t() | nil) :: String.t()
@@ -274,7 +274,7 @@ defmodule OneSignal.API_V2 do
   defp decompress_body(body, headers) do
     headers_dict = :hackney_headers.new(headers)
 
-    case :hackney_headers.get_value("Content-Encoding", headers_dict) do
+    case :hackney_headers.get_value("content-encoding", headers_dict) do
       "gzip" -> :zlib.gunzip(body)
       "deflate" -> :zlib.unzip(body)
       _ -> body

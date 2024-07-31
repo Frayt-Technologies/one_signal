@@ -6,10 +6,6 @@ defmodule OneSignal.Subscription do
     "/subscriptions" <> "/#{get_id!(id)}"
   end
 
-  # defp plural_endpoint(%{alias_label: alias_label, alias_id: alias_id}) do
-  #   "/users/by/#{alias_label}" <> "/#{get_id!(alias_id)}" <> plural_endpoint()
-  # end
-
   @type retrieve_by :: :onesignal_id | :external_id
 
   @type type ::
@@ -99,6 +95,36 @@ defmodule OneSignal.Subscription do
     new_request(opts)
     |> put_endpoint(plural_endpoint(id))
     |> put_method(:patch)
+    |> put_params(params)
+    |> make_request()
+  end
+
+  @spec create(OneSignal.id() | t, retrieve_by, params, OneSignal.options()) ::
+          {:ok, t} | {:error, OneSignal.Error.t()}
+        when params:
+               %{
+                 optional(:type) => type,
+                 optional(:token) => String.t() | nil,
+                 optional(:enabled) => boolean,
+                 optional(:notification_types) => integer | nil,
+                 optional(:session_time) => integer | nil,
+                 optional(:session_count) => integer | nil,
+                 optional(:app_version) => String.t() | nil,
+                 optional(:device_model) => String.t() | nil,
+                 optional(:device_os) => String.t() | nil,
+                 optional(:test_type) => integer | nil,
+                 optional(:sdk) => String.t() | nil,
+                 optional(:rooted) => boolean | nil,
+                 optional(:web_auth) => String.t() | nil,
+                 optional(:web_p256) => String.t() | nil,
+                 optional(:net_type) => integer | nil,
+                 optional(:carrier) => String.t() | nil
+               }
+               | %{}
+  def create(id, retrieve_by, params, opts \\ []) do
+    new_request(opts)
+    |> put_endpoint("/users/by/#{retrieve_by}" <> "/#{get_id!(id)}" <> "/subscriptions")
+    |> put_method(:post)
     |> put_params(params)
     |> make_request()
   end
