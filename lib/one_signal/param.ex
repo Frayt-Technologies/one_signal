@@ -55,9 +55,9 @@ defmodule OneSignal.Param do
   """
   def build(%Param{name: _} = param) do
     required = %{
-      :app_id => OneSignal.fetch_app_id(:current),
+      :app_id => OneSignal.fetch_app_id(),
       :sms_from => OneSignal.fetch_from_number(),
-      :contents => Enum.map(param.messages, &to_string_key/1) |> Enum.into(%{}),
+      :contents => Enum.map(param.messages, &to_string_key/1) |> Enum.into(%{})
     }
 
     param
@@ -73,7 +73,7 @@ defmodule OneSignal.Param do
 
   def build(%Param{} = param) do
     required = %{
-      :app_id => OneSignal.fetch_app_id(:current),
+      :app_id => OneSignal.fetch_app_id(),
       :contents => Enum.map(param.messages, &to_string_key/1) |> Enum.into(%{}),
       :filters => param.filters
     }

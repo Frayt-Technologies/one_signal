@@ -24,9 +24,7 @@ defmodule OneSignal do
     %OneSignal.Param{}
   end
 
-  def auth_header(:legacy), do: auth_header(fetch_api_key(:legacy))
-
-  def auth_header(:current), do: auth_header(fetch_api_key(:current))
+  def auth_header(), do: auth_header(fetch_api_key())
 
   def auth_header(nil) do
     {:error, "Missing API key, please refer to the README on how to configure it."}
@@ -36,19 +34,11 @@ defmodule OneSignal do
     {:ok, %{"Authorization" => "Basic " <> api_key, "Content-type" => "application/json"}}
   end
 
-  defp fetch_api_key(:legacy) do
-    Utils.config()[:legacy_api_key] || System.get_env("ONE_SIGNAL_LEGACY_API_KEY")
-  end
-
-  defp fetch_api_key(:current) do
+  defp fetch_api_key() do
     Utils.config()[:api_key] || System.get_env("ONE_SIGNAL_API_KEY")
   end
 
-  def fetch_app_id(:legacy) do
-    Utils.config()[:legacy_app_id] || System.get_env("ONE_SIGNAL_LEGACY_APP_ID")
-  end
-
-  def fetch_app_id(:current) do
+  def fetch_app_id() do
     Utils.config()[:app_id] || System.get_env("ONE_SIGNAL_APP_ID")
   end
 

@@ -19,14 +19,8 @@ defmodule OneSignal.API do
   end
 
   defp get_request(url) do
-    if include_legacy_notifications(),
-      do: [get_request(url, :current), get_request(url, :legacy)],
-      else: [get_request(url, :current)]
-  end
-
-  defp get_request(url, type) do
     with get_notification <- Utils.config()[:get_notification],
-         {:ok, response} <- get_notification.(url, OneSignal.auth_header(type)) do
+         {:ok, response} <- get_notification.(url, OneSignal.auth_header()) do
       {:ok, response}
     else
       {:error, error} -> {:error, error}
@@ -48,16 +42,10 @@ defmodule OneSignal.API do
   end
 
   defp post_request(url, body) do
-    if include_legacy_notifications(),
-      do: [post_request(url, body, :current), post_request(url, body, :legacy)],
-      else: [post_request(url, body, :current)]
-  end
-
-  defp post_request(url, body, type) do
-    with body <- Map.put(body, :app_id, OneSignal.fetch_app_id(type)),
+    with body <- Map.put(body, :app_id, OneSignal.fetch_app_id()),
          {:ok, req_body} <- Poison.encode(body),
          post_notification <- Utils.config()[:post_notification],
-         {:ok, req_header} <- OneSignal.auth_header(type),
+         {:ok, req_header} <- OneSignal.auth_header(),
          {:ok, response} <- post_notification.(url, req_body, req_header) do
       {:ok, response}
     else
@@ -83,14 +71,8 @@ defmodule OneSignal.API do
   end
 
   defp delete_request(url) do
-    if include_legacy_notifications(),
-      do: [delete_request(url, :current), delete_request(url, :legacy)],
-      else: [delete_request(url, :current)]
-  end
-
-  defp delete_request(url, type) do
     with delete_notification <- Utils.config()[:delete_notification],
-         {:ok, response} <- delete_notification.(url, OneSignal.auth_header(type)) do
+         {:ok, response} <- delete_notification.(url, OneSignal.auth_header()) do
       {:ok, response}
     else
       {:error, error} -> {:error, error}
@@ -125,13 +107,6 @@ defmodule OneSignal.API do
 
   defp handle_response(error),
     do: {:error, {:unknown, "An unknown error has occured", error}}
-
-  defp include_legacy_notifications() do
-    if not is_nil(Utils.config()[:legacy_api_key]) and
-         not is_nil(Utils.config()[:legacy_app_id]),
-       do: true,
-       else: false
-  end
 
   defp pick_response(responses) do
     success =
