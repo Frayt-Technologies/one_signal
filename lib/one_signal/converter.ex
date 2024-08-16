@@ -13,6 +13,7 @@ defmodule OneSignal.Converter do
   @supported_objects ~w(
     onesignal.user
     onesignal.subscription
+    onesignal.identity
   )
 
   @doc """
@@ -55,6 +56,10 @@ defmodule OneSignal.Converter do
   end
 
   defp convert_value(value, "/users/by" <> _) do
+    convert_onesignal_object("onesignal.user", value)
+  end
+
+  defp convert_value(value, "/users" <> _) do
     convert_onesignal_object("onesignal.user", value)
   end
 
