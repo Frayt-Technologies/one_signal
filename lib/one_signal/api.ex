@@ -1,4 +1,4 @@
-defmodule OneSignal.API_V2 do
+defmodule OneSignal.API do
   alias OneSignal.{Error, Config, Utils}
 
   @idempotency_key_header "Idempotency-Key"
