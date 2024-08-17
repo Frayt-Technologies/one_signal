@@ -18,12 +18,6 @@ defmodule OneSignal do
     Supervisor.start_link(children, opts)
   end
 
-  def endpoint, do: "https://onesignal.com/api/v1"
-
-  def new do
-    %OneSignal.Param{}
-  end
-
   def auth_header(), do: auth_header(fetch_api_key())
 
   def auth_header(nil) do
