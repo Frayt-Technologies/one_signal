@@ -23,7 +23,7 @@ defmodule OneSignal.API do
       body
       |> OneSignal.Utils.map_keys_to_atoms()
       |> OneSignal.URI.encode_query()
-      |> prepend_url("#{get_base_url()}#{get_app_id()}#{endpoint}")
+      |> prepend_url("#{get_base_url()}/apps/#{get_app_id()}#{endpoint}")
 
     perform_request(req_url, :get, "", headers, opts)
   end
@@ -31,7 +31,13 @@ defmodule OneSignal.API do
   def request(body, method, endpoint, headers, opts) do
     {idempotency_key, opts} = Keyword.pop(opts, :idempotency_key)
 
-    req_url = "#{get_base_url()}#{get_app_id()}#{endpoint}"
+    req_url =
+      if Map.has_key?(body, :app_id) do
+        "#{get_base_url()}#{endpoint}"
+      else
+        "#{get_base_url()}/apps/#{get_app_id()}#{endpoint}"
+      end
+
     headers = add_idempotency_header(idempotency_key, headers, method)
 
     req_body =
@@ -207,6 +213,9 @@ defmodule OneSignal.API do
     error =
       case json_library().decode(body) do
         {:ok, %{"errors" => api_error}} ->
+          Error.from_onesignal_error(status, api_error)
+
+        {:ok, %{"error" => api_error}} ->
           Error.from_onesignal_error(status, api_error)
 
         {:error, _} ->
