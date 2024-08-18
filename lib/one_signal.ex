@@ -1,6 +1,5 @@
 defmodule OneSignal do
   use Application
-  alias OneSignal.Utils
 
   @type id :: String.t()
   @type options :: Keyword.t()

@@ -1,25 +1,26 @@
 defmodule OneSignal.Notification do
   use OneSignal.Entity
   import OneSignal.Request
+  alias OneSignal.Utils
 
   @plural_endpoint "/notifications"
 
   @type target_channel :: :email | :sms | :push
 
   @type t :: %__MODULE__{
-          included_segments: list(string) | nil,
-          excluded_segments: list(string) | nil,
-          include_email_tokens: list(string) | nil,
-          include_phone_numbers: list(string) | nil,
+          included_segments: list(String.t()) | nil,
+          excluded_segments: list(String.t()) | nil,
+          include_email_tokens: list(String.t()) | nil,
+          include_phone_numbers: list(String.t()) | nil,
           # filters: list(OneSignal.Filter) | nil,
           include_aliases:
             %{
-              external_id: list(string) | nil,
-              onesignal_id: list(string) | nil,
-              some_custom_alias: list(string) | nil
+              external_id: list(String.t()) | nil,
+              onesignal_id: list(String.t()) | nil,
+              some_custom_alias: list(String.t()) | nil
             }
             | nil,
-          include_subscription_ids: list(string) | nil,
+          include_subscription_ids: list(String.t()) | nil,
           target_channel: target_channel,
           custom_data: map() | nil,
           template_id: String.t() | nil,
@@ -32,6 +33,7 @@ defmodule OneSignal.Notification do
           url: String.t() | nil
         }
 
+  @enforce_keys [:include_aliases, :target_channel, :contents]
   defstruct [
     :included_segments,
     :excluded_segments,
@@ -53,7 +55,19 @@ defmodule OneSignal.Notification do
     new_request(opt)
     |> put_endpoint(@plural_endpoint)
     |> put_method(:post)
+    |> put_sms_from_number(params)
     |> put_params(params)
     |> make_request()
+  end
+
+  defp put_sms_from_number(request, %{target_channel: "sms"}) do
+    put_param(request, "sms_from", fetch_from_number())
+  end
+
+  defp put_sms_from_number(request, _params), do: request
+
+  def fetch_from_number() do
+    Utils.config()[:sms_from] ||
+      System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER") |> IO.inspect(label: "SMS_FROM_NUMBER")
   end
 end

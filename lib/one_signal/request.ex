@@ -17,8 +17,8 @@ defmodule OneSignal.Request do
   alias OneSignal.{API, Converter, Request}
 
   @type t :: %__MODULE__{
-          cast_to_id: MapSet.t(),
-          endpoint: String.t(),
+          cast_to_id: MapSet.t() | nil,
+          endpoint: String.t() | nil,
           headers: map | nil,
           method: OneSignal.API.method() | nil,
           opts: Keyword.t() | nil,
