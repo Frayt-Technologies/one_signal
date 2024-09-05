@@ -7,6 +7,12 @@ defmodule OneSignal.Notification do
 
   @type target_channel :: :email | :sms | :push
 
+  @type response :: %{
+          external_id: String.t() | nil,
+          id: String.t() | nil,
+          errors: list(map()) | nil
+        }
+
   @type t :: %__MODULE__{
           included_segments: list(String.t()) | nil,
           excluded_segments: list(String.t()) | nil,
@@ -70,7 +76,7 @@ defmodule OneSignal.Notification do
     }
   end
 
-  @spec create(t, OneSignal.options()) :: {:ok, nil} | {:error, OneSignal.Error.t()}
+  @spec create(t, OneSignal.options()) :: {:ok, response} | {:error, OneSignal.Error.t()}
   def create(params, opt \\ []) do
     new_request(opt)
     |> put_endpoint(@plural_endpoint)
