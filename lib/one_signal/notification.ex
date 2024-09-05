@@ -1,27 +1,73 @@
 defmodule OneSignal.Notification do
-  defstruct id: nil, recipients: 0, errors: %{}
+  use OneSignal.Entity
+  import OneSignal.Request
+  alias OneSignal.Utils
 
-  def post_notification_url() do
-    OneSignal.endpoint() <> "/notifications"
+  @plural_endpoint "/notifications"
+
+  @type target_channel :: :email | :sms | :push
+
+  @type t :: %__MODULE__{
+          included_segments: list(String.t()) | nil,
+          excluded_segments: list(String.t()) | nil,
+          include_email_tokens: list(String.t()) | nil,
+          include_phone_numbers: list(String.t()) | nil,
+          # filters: list(OneSignal.Filter) | nil,
+          include_aliases:
+            %{
+              external_id: list(String.t()) | nil,
+              onesignal_id: list(String.t()) | nil,
+              some_custom_alias: list(String.t()) | nil
+            }
+            | nil,
+          include_subscription_ids: list(String.t()) | nil,
+          target_channel: target_channel,
+          custom_data: map() | nil,
+          template_id: String.t() | nil,
+          contents: %{
+            en: String.t()
+          },
+          headings: %{
+            en: String.t()
+          },
+          url: String.t() | nil
+        }
+
+  @enforce_keys [:include_aliases, :target_channel, :contents]
+  defstruct [
+    :included_segments,
+    :excluded_segments,
+    :include_email_tokens,
+    :include_phone_numbers,
+    # :filters,
+    :include_aliases,
+    :include_subscription_ids,
+    :target_channel,
+    :custom_data,
+    :template_id,
+    :contents,
+    :headings,
+    :url
+  ]
+
+  @spec create(t, OneSignal.options()) :: {:ok, nil} | {:error, OneSignal.Error.t()}
+  def create(params, opt \\ []) do
+    new_request(opt)
+    |> put_endpoint(@plural_endpoint)
+    |> put_method(:post)
+    |> put_sms_from_number(params)
+    |> put_params(params)
+    |> make_request()
   end
 
-  @doc """
-  Send push notification
-  iex> OneSignal.Notification.send(%{"en" => "Hello!", "ja" => "はろー"}, %{"included_segments" => ["All"], "isAndroid" => true})
-  """
-
-  def send(body) do
-    case OneSignal.API.post(post_notification_url(), body) do
-      {:ok, response} ->
-        response = Enum.map(response, &to_key_atom/1)
-        struct(__MODULE__, response)
-
-      err ->
-        err
-    end
+  defp put_sms_from_number(request, %{target_channel: "sms"}) do
+    put_param(request, "sms_from", fetch_from_number())
   end
 
-  def to_key_atom({k, v}) do
-    {String.to_atom(k), v}
+  defp put_sms_from_number(request, _params), do: request
+
+  def fetch_from_number() do
+    Utils.config()[:sms_from] ||
+      System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER") |> IO.inspect(label: "SMS_FROM_NUMBER")
   end
 end

@@ -14,13 +14,13 @@ defmodule OneSignal.Request do
   At a minimum, a request must have the endpoint and method specified to be
   valid.
   """
-  alias OneSignal.{API_V2, Converter, Request}
+  alias OneSignal.{API, Converter, Request}
 
   @type t :: %__MODULE__{
-          cast_to_id: MapSet.t(),
+          cast_to_id: MapSet.t() | nil,
           endpoint: String.t() | nil,
           headers: map | nil,
-          method: OneSignal.API_v2.method() | nil,
+          method: OneSignal.API.method() | nil,
           opts: Keyword.t() | nil,
           params: map
         }
@@ -65,7 +65,7 @@ defmodule OneSignal.Request do
   Accepts any of the standard HTTP methods as atoms, that is `:get`, `:post`,
   `:put`, `:patch` or `:delete`.
   """
-  @spec put_method(t, OneSignal.API_v2.method()) :: t
+  @spec put_method(t, OneSignal.API.method()) :: t
   def put_method(%Request{} = request, method)
       when method in [:get, :post, :put, :patch, :delete] do
     %{request | method: method}
@@ -103,7 +103,7 @@ defmodule OneSignal.Request do
       ) do
     with {:ok, params} <- do_cast_to_id(params, request.cast_to_id),
          {:ok, endpoint} <- consolidate_endpoint(endpoint, params),
-         {:ok, result} <- API_V2.request(params, method, endpoint, headers, opts) do
+         {:ok, result} <- API.request(params, method, endpoint, headers, opts) do
       {:ok, Converter.convert_result(result, endpoint)}
     end
   end
