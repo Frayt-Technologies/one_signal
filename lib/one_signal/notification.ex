@@ -93,7 +93,6 @@ defmodule OneSignal.Notification do
   defp put_sms_from_number(request, _params), do: request
 
   def fetch_from_number() do
-    Utils.config()[:sms_from] ||
-      System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER") |> IO.inspect(label: "SMS_FROM_NUMBER")
+    Utils.config()[:sms_from] || System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER")
   end
 end

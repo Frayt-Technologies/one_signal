@@ -118,23 +118,9 @@ defmodule OneSignal.Error do
 
   defp message_from_status(s), do: "An unknown HTTP code of #{s} was received."
 
-  def exception(reason),
-    do: %__MODULE__{title: reason}
+  def exception(reason), do: %__MODULE__{title: reason}
 
-  def message(%__MODULE__{title: title}),
-    do: format_error(title)
-
-  defp format_error({:httpoison, value}),
-    do: "HTTPoison error: #{inspect(value)}"
-
-  defp format_error({:invalid, value}), do: "Invalid body in request: #{inspect(value)}"
-
-  defp format_error(%{title: value}),
-    do: "Invalid request: #{inspect(value)}"
-
-  defp format_error({:unknown, value}), do: value
-
-  defp format_error({:not_implemented, value}), do: value
+  def message(%__MODULE__{title: title}), do: "Invalid request: #{title}"
 
   defp maybe_to_atom(nil), do: nil
   defp maybe_to_atom(string) when is_binary(string), do: string |> String.to_atom()
