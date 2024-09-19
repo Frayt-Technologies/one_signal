@@ -83,6 +83,7 @@ defmodule OneSignal.Notification do
     |> put_method(:post)
     |> put_sms_from_number(params)
     |> put_params(params)
+    |> put_app_id()
     |> make_request()
   end
 
@@ -91,6 +92,11 @@ defmodule OneSignal.Notification do
   end
 
   defp put_sms_from_number(request, _params), do: request
+
+  defp put_app_id(request) do
+    app_id = Utils.config()[:app_id] || System.get_env("ONE_SIGNAL_APP_ID")
+    put_param(request, :app_id, app_id)
+  end
 
   def fetch_from_number() do
     Utils.config()[:sms_from] || System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER")

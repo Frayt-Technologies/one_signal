@@ -22,6 +22,7 @@ defmodule OneSignal.API do
     req_url =
       body
       |> OneSignal.Utils.map_keys_to_atoms()
+      |> OneSignal.Utils.remove_nil_values()
       |> OneSignal.URI.encode_query()
       |> prepend_url("#{get_base_url()}/apps/#{get_app_id()}#{endpoint}")
 
@@ -43,6 +44,7 @@ defmodule OneSignal.API do
     req_body =
       body
       |> OneSignal.Utils.map_keys_to_atoms()
+      |> OneSignal.Utils.remove_nil_values()
       |> Jason.encode!()
 
     perform_request(req_url, method, req_body, headers, opts)
@@ -209,9 +211,13 @@ defmodule OneSignal.API do
     {:ok, decoded_body}
   end
 
-  defp handle_response({:ok, status, _headers, body}) when status >= 300 and status <= 599 do
+  defp handle_response({:ok, status, headers, body}) when status >= 300 and status <= 599 do
+    body = decompress_body(body, headers)
+          |> String.trim()
+          |> String.replace("\\n", "")
+
     error =
-      case json_library().decode(body) do
+      case Jason.decode(body) do
         {:ok, %{"errors" => api_error}} ->
           Error.from_onesignal_error(status, api_error)
 
@@ -219,7 +225,6 @@ defmodule OneSignal.API do
           Error.from_onesignal_error(status, api_error)
 
         {:error, _} ->
-          # e.g. if the body is empty
           Error.from_onesignal_error(status, nil)
       end
 
