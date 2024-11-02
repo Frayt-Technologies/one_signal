@@ -1,7 +1,6 @@
 defmodule OneSignal.Notification do
   use OneSignal.Entity
   import OneSignal.Request
-  alias OneSignal.Utils
 
   @plural_endpoint "/notifications"
 
@@ -85,20 +84,5 @@ defmodule OneSignal.Notification do
     |> put_params(params)
     |> put_app_id()
     |> make_request()
-  end
-
-  defp put_sms_from_number(request, %{target_channel: "sms"}) do
-    put_param(request, "sms_from", fetch_from_number())
-  end
-
-  defp put_sms_from_number(request, _params), do: request
-
-  defp put_app_id(request) do
-    app_id = Utils.config()[:app_id] || System.get_env("ONE_SIGNAL_APP_ID")
-    put_param(request, :app_id, app_id)
-  end
-
-  def fetch_from_number() do
-    Utils.config()[:sms_from] || System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER")
   end
 end

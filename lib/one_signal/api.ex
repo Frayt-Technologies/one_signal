@@ -212,9 +212,10 @@ defmodule OneSignal.API do
   end
 
   defp handle_response({:ok, status, headers, body}) when status >= 300 and status <= 599 do
-    body = decompress_body(body, headers)
-          |> String.trim()
-          |> String.replace("\\n", "")
+    body =
+      decompress_body(body, headers)
+      |> String.trim()
+      |> String.replace("\\n", "")
 
     error =
       case Jason.decode(body) do

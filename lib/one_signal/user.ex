@@ -52,4 +52,14 @@ defmodule OneSignal.User do
     |> put_params(params)
     |> make_request()
   end
+
+  @spec create_alias_by_subscription(String.t(), t, OneSignal.options()) ::
+          {:ok, t} | {:error, OneSignal.Error.t()}
+  def create_alias_by_subscription(subsctiption_id, params, opts \\ []) do
+    new_request(opts)
+    |> put_endpoint("/subscriptions/#{subsctiption_id}/user/identity")
+    |> put_method(:patch)
+    |> put_params(params)
+    |> make_request()
+  end
 end
