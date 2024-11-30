@@ -14,7 +14,7 @@ defmodule OneSignal.Request do
   At a minimum, a request must have the endpoint and method specified to be
   valid.
   """
-  alias OneSignal.{API, Converter, Request}
+  alias OneSignal.{API, Converter, Request, Utils}
 
   @type t :: %__MODULE__{
           cast_to_id: MapSet.t() | nil,
@@ -70,6 +70,20 @@ defmodule OneSignal.Request do
       when method in [:get, :post, :put, :patch, :delete] do
     %{request | method: method}
   end
+
+  @spec put_app_id(t) :: t
+  def put_app_id(request) do
+    app_id = Utils.config()[:app_id] || System.get_env("ONE_SIGNAL_APP_ID")
+    put_param(request, :app_id, app_id)
+  end
+
+  @spec put_sms_from_number(t, map) :: t
+  def put_sms_from_number(request, %{target_channel: "sms"}) do
+    sms_from = Utils.config()[:sms_from] || System.get_env("ONE_SIGNAL_SMS_FROM_NUMBER")
+    put_param(request, :sms_from, sms_from)
+  end
+
+  def put_sms_from_number(request, _params), do: request
 
   @doc """
   Specifies the parameters to be used for the request.

@@ -88,14 +88,39 @@ defmodule OneSignal.Utils do
     }
   }
   """
-  def map_keys_to_atoms(m) do
-    Enum.into(m, %{}, fn
-      {k, v} when is_binary(k) ->
-        a = String.to_atom(k)
-        {a, v}
+  def map_keys_to_atoms(struct) when is_struct(struct) do
+    struct
+    |> Map.from_struct()  # Convert the struct to a map
+    |> Enum.reduce(%{}, fn {key, value}, acc ->
+      atom_value = if is_map(value), do: map_keys_to_atoms(value), else: value
+      Map.put(acc, key, atom_value)
+    end)
+  end
 
-      entry ->
-        entry
+  def map_keys_to_atoms(map) when is_map(map) do
+    map
+    |> Enum.reduce(%{}, fn {key, value}, acc ->
+      atom_key = if is_binary(key), do: String.to_atom(key), else: key
+      atom_value = if is_map(value), do: map_keys_to_atoms(value), else: value
+      Map.put(acc, atom_key, atom_value)
+    end)
+  end
+
+  def remove_nil_values(map) when is_map(map) do
+    map
+    |> Enum.reduce(%{}, fn
+      {key, value}, acc when is_map(value) ->
+        cleaned_value = remove_nil_values(value)
+        if map_size(cleaned_value) > 0 do
+          Map.put(acc, key, cleaned_value)
+        else
+          acc
+        end
+
+      {key, value}, acc when value != nil ->
+        Map.put(acc, key, value)
+
+      _, acc -> acc
     end)
   end
 end

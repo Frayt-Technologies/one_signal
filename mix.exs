@@ -23,7 +23,6 @@ defmodule OneSignal.Mixfile do
     [
       applications: [:hackney, :logger, :jason, :uri_query],
       mod: {OneSignal, []},
-      extra_applications: [:poison]
     ]
   end
 
@@ -37,8 +36,6 @@ defmodule OneSignal.Mixfile do
 
   defp deps() do
     [
-      {:poison, "~> 3.1.0"},
-      {:httpoison, "~> 1.8.0"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:uri_query, "~> 0.1.2"},
       {:jason, "~> 1.0"},
