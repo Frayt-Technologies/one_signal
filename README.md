@@ -34,12 +34,5 @@ config :one_signal, OneSignal,
 ## Composable design, Data structure oriented
 
 ```elixir
-  import OneSignal.Param
-  OneSignal.new
-  |> put_heading("Welcome!")
-  |> put_message(:en, "Hello")
-  |> put_message(:ja, "はろー")
-  |> put_segment("Free Players")
-  |> put_segment("New Players")
-  |> notify
+# TODO: How to use this package.
 ```
