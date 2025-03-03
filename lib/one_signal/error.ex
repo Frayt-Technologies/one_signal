@@ -41,6 +41,15 @@ defmodule OneSignal.Error do
   end
 
   @doc false
+  def from_onesignal_error(200, error) when is_map(error) do
+    %__MODULE__{
+      source: :onesignal,
+      code: :unknown_error,
+      title: "#{inspect(error)}",
+      meta: error
+    }
+  end
+
   @spec from_onesignal_error(400..599, nil) :: t
   def from_onesignal_error(status, nil) do
     %__MODULE__{

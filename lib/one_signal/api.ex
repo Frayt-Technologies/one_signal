@@ -126,7 +126,7 @@ defmodule OneSignal.API do
   @spec add_auth_header(headers, String.t() | nil) :: headers
   defp add_auth_header(existing_headers, api_key) do
     api_key = fetch_api_key(api_key)
-    Map.put(existing_headers, "Authorization", "Basic #{api_key}")
+    Map.put(existing_headers, "Authorization", "Key #{api_key}")
   end
 
   @spec fetch_api_key(String.t() | nil) :: String.t()
@@ -207,6 +207,13 @@ defmodule OneSignal.API do
       body
       |> decompress_body(headers)
       |> json_library().decode!()
+      |> case do
+        %{"errors" => api_error} ->
+          Error.from_onesignal_error(status, api_error)
+
+        decoded_body ->
+          decoded_body
+      end
 
     {:ok, decoded_body}
   end
