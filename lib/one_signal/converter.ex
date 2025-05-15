@@ -81,7 +81,7 @@ defmodule OneSignal.Converter do
   @spec convert_onesignal_object(String.t(), %{String.t() => any}) :: struct
   defp convert_onesignal_object(object_name, value) do
     module = OneSignal.Utils.object_name_to_module(object_name)
-    struct_keys = Map.keys(module.__struct__) |> List.delete(:__struct__)
+    struct_keys = Map.keys(struct(module, %{})) |> List.delete(:__struct__)
     check_for_extra_keys(struct_keys, value)
 
     processed_map =
