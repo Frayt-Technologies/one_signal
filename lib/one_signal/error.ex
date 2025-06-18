@@ -1,5 +1,5 @@
 defmodule OneSignal.Error do
-  defexception [:source, :code, :title, :meta]
+  defexception [:source, :code, :title, :meta, :id]
 
   @type error_source :: :internal | :network | :onesignal
 
@@ -17,7 +17,8 @@ defmodule OneSignal.Error do
           source: error_source,
           code: error_status | :network_error,
           title: String.t(),
-          meta: String.t() | nil
+          meta: String.t() | nil,
+          id: String.t() | nil
         }
 
   @doc false
@@ -45,7 +46,8 @@ defmodule OneSignal.Error do
     %__MODULE__{
       source: :onesignal,
       code: :unknown_error,
-      title: "#{inspect(error)}",
+      id: Map.get(error, "id"),
+      title: Map.get(error, "errors"),
       meta: error
     }
   end

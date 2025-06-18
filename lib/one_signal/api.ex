@@ -208,8 +208,8 @@ defmodule OneSignal.API do
       |> decompress_body(headers)
       |> json_library().decode!()
       |> case do
-        %{"errors" => api_error} ->
-          Error.from_onesignal_error(status, api_error)
+        %{"errors" => _api_error} = decoded_body ->
+          Error.from_onesignal_error(status, decoded_body)
 
         decoded_body ->
           decoded_body
