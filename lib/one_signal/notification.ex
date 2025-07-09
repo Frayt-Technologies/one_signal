@@ -36,7 +36,17 @@ defmodule OneSignal.Notification do
           headings: %{
             en: String.t()
           },
-          url: String.t() | nil
+          url: String.t() | nil,
+          email_to: list(String.t()) | nil,
+          email_subject: String.t() | nil,
+          email_body: String.t() | nil,
+          email_preheader: String.t() | nil,
+          email_from_name: String.t() | nil,
+          email_from_address: String.t() | nil,
+          email_sender_domain: String.t() | nil,
+          email_reply_to_address: String.t() | nil,
+          include_unsubscribed: boolean() | nil,
+          disable_email_click_tracking: boolean() | nil
         }
 
   @enforce_keys [:include_aliases, :target_channel, :contents]
@@ -54,7 +64,17 @@ defmodule OneSignal.Notification do
     :name,
     :contents,
     :headings,
-    :url
+    :url,
+    :email_to,
+    :email_subject,
+    :email_body,
+    :email_preheader,
+    :email_from_name,
+    :email_from_address,
+    :email_sender_domain,
+    :email_reply_to_address,
+    :include_unsubscribed,
+    :disable_email_click_tracking
   ]
 
   def new(params) do
@@ -71,7 +91,17 @@ defmodule OneSignal.Notification do
       name: params[:name],
       contents: params[:contents],
       headings: params[:headings],
-      url: params[:url]
+      url: params[:url],
+      email_to: params[:email_to],
+      email_subject: params[:email_subject],
+      email_body: params[:email_body],
+      email_preheader: params[:email_preheader],
+      email_from_name: params[:email_from_name],
+      email_from_address: params[:email_from_address],
+      email_sender_domain: params[:email_sender_domain],
+      email_reply_to_address: params[:email_reply_to_address],
+      include_unsubscribed: params[:include_unsubscribed],
+      disable_email_click_tracking: params[:disable_email_click_tracking]
     }
   end
 
