@@ -23,7 +23,7 @@ defmodule OneSignal.Subscription do
           | :Email
           | :SMS
 
-  @type t :: %__MODULE__{
+  @type properties :: %{
           id: OneSignal.id(),
           app_id: OneSignal.id(),
           type: type,
@@ -44,25 +44,15 @@ defmodule OneSignal.Subscription do
           carrier: String.t() | nil
         }
 
+  @type t :: %__MODULE__{
+    identity: OneSignal.Identity,
+    subscription: properties | nil
+  }
+
   defstruct [
-    :id,
-    :app_id,
-    :type,
-    :token,
-    :enabled,
-    :notification_types,
-    :session_time,
-    :session_count,
-    :sdk,
-    :device_model,
-    :device_os,
-    :rooted,
-    :test_type,
-    :app_version,
-    :net_type,
-    :carrier,
-    :web_auth,
-    :web_p256
+    :identity,
+    :subscription,
+    :properties
   ]
 
   @doc """
@@ -126,6 +116,13 @@ defmodule OneSignal.Subscription do
     |> put_endpoint("/users/by/#{retrieve_by}" <> "/#{get_id!(id)}" <> "/subscriptions")
     |> put_method(:post)
     |> put_params(params)
+    |> make_request()
+  end
+
+  def delete(subsctiption_id, opts \\ []) do
+    new_request(opts)
+    |> put_endpoint("/subscriptions" <> "/#{subsctiption_id}")
+    |> put_method(:delete)
     |> make_request()
   end
 end
