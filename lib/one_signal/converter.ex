@@ -51,12 +51,22 @@ defmodule OneSignal.Converter do
     end
   end
 
-  defp convert_value(_, "/subscriptions" <> _) do
-    %{}
-  end
-
   defp convert_value(value, "/notifications" <> _) do
     value
+  end
+
+  defp convert_value(value, "/users/by/external_id/" <> rest) do
+    case String.split(rest, "/") do
+      [uuid, "subscriptions"] when is_binary(uuid) ->
+        convert_onesignal_object("onesignal.subscription", value)
+
+      _ ->
+        convert_onesignal_object("onesignal.user", value)
+    end
+  end
+
+  defp convert_value(value, "/subscriptions/" <> _rest) do
+    convert_onesignal_object("onesignal.subscription", value)
   end
 
   defp convert_value(value, "/users/by" <> _) do
