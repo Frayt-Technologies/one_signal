@@ -119,9 +119,9 @@ defmodule OneSignal.Subscription do
     |> make_request()
   end
 
-  def delete(subsctiption_id, opts \\ []) do
+  def delete(subscription_id, opts \\ []) do
     new_request(opts)
-    |> put_endpoint("/subscriptions" <> "/#{subsctiption_id}")
+    |> put_endpoint("/subscriptions" <> "/#{subscription_id}")
     |> put_method(:delete)
     |> make_request()
   end
