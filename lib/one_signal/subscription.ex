@@ -45,9 +45,9 @@ defmodule OneSignal.Subscription do
         }
 
   @type t :: %__MODULE__{
-    identity: OneSignal.Identity,
-    subscription: properties | nil
-  }
+          identity: OneSignal.Identity,
+          subscription: properties | nil
+        }
 
   defstruct [
     :identity,
@@ -123,6 +123,17 @@ defmodule OneSignal.Subscription do
     new_request(opts)
     |> put_endpoint("/subscriptions" <> "/#{subscription_id}")
     |> put_method(:delete)
+    |> make_request()
+  end
+
+  @spec transfer(OneSignal.id() | t, params, OneSignal.options()) ::
+          {:ok, t} | {:error, OneSignal.Error.t()}
+        when params: t
+  def transfer(id, params, opts \\ []) do
+    new_request(opts)
+    |> put_endpoint(plural_endpoint(id) <> "/owner")
+    |> put_method(:patch)
+    |> put_params(params)
     |> make_request()
   end
 end
